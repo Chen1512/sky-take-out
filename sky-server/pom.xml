@@ -11,51 +11,60 @@
     <artifactId>sky-server</artifactId>
     <dependencies>
 
+<!--        common依赖-->
         <dependency>
             <groupId>com.sky</groupId>
             <artifactId>sky-common</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
 
+<!--        pojo依赖-->
         <dependency>
             <groupId>com.sky</groupId>
             <artifactId>sky-pojo</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
 
+<!--        boot核心依赖-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
         </dependency>
 
+<!--        测试依赖-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
 
+<!--        web依赖-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
             <scope>compile</scope>
         </dependency>
 
+<!--        mysql-->
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <scope>runtime</scope>
         </dependency>
 
+<!--        mybatis-->
         <dependency>
             <groupId>org.mybatis.spring.boot</groupId>
             <artifactId>mybatis-spring-boot-starter</artifactId>
         </dependency>
 
+<!--        lombok依赖-->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
         </dependency>
 
+<!--      Json依赖 处理Java对象和JSON之间相互转换 -->
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
@@ -66,6 +75,7 @@
             <artifactId>druid-spring-boot-starter</artifactId>
         </dependency>
 
+<!--        分页依赖-->
         <dependency>
             <groupId>com.github.pagehelper</groupId>
             <artifactId>pagehelper-spring-boot-starter</artifactId>
@@ -81,11 +91,13 @@
             <artifactId>aspectjweaver</artifactId>
         </dependency>
 
+<!--    Swagger：使用依赖-->
         <dependency>
             <groupId>com.github.xiaoymin</groupId>
             <artifactId>knife4j-spring-boot-starter</artifactId>
         </dependency>
 
+<!--        redis依赖-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-redis</artifactId>

@@ -1,6 +1,7 @@
 package com.sky.interceptor;
 
 import com.sky.constant.JwtClaimsConstant;
+import com.sky.context.BaseContext;
 import com.sky.properties.JwtProperties;
 import com.sky.utils.JwtUtil;
 import io.jsonwebtoken.Claims;
@@ -44,9 +45,13 @@ public class JwtTokenAdminInterceptor implements HandlerInterceptor {
         //2、校验令牌
         try {
             log.info("jwt校验:{}", token);
+            //通过调用 JwtUtil.parseJWT(jwtProperties.getAdminSecretKey(), token) 方法，你可以获取解析后的JWT负载信息（Claims）
+            //jwtProperties.getAdminSecretKey()：用于解析JWT的密钥（或称为秘钥）。
+            //token：要解析和验证的JWT字符串。
             Claims claims = JwtUtil.parseJWT(jwtProperties.getAdminSecretKey(), token);
             Long empId = Long.valueOf(claims.get(JwtClaimsConstant.EMP_ID).toString());
             log.info("当前员工id：", empId);
+            BaseContext.setCurrentId(empId);
             //3、通过，放行
             return true;
         } catch (Exception ex) {
