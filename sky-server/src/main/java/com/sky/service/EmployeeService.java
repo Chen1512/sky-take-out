@@ -23,5 +23,19 @@ public interface EmployeeService {
      */
     void save(EmployeeDTO employeeDTO);
 
+    /**
+     * @Description:分页查询
+     * @return: com.sky.result.PageResult
+     * @author: chen
+     * @date: 2023/7/10 13:56
+     */
     PageResult pageQuery(EmployeePageQueryDTO employeePageQueryDTO);
+
+    /**
+     * @Description:启用禁用员工账号
+     * @return: void
+     * @author: chen
+     * @date: 2023/7/10 13:57
+     */
+    void startOrStop(Integer status, Long id);
 }

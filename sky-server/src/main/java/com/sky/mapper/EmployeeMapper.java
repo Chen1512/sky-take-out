@@ -29,5 +29,19 @@ public interface EmployeeMapper {
             "(#{name},#{username},#{password},#{phone},#{sex},#{idNumber},#{createTime},#{updateTime},#{createUser},#{updateUser})")
     void insert(Employee employee);
 
+    /**
+     * @Description:分页查询
+     * @return: com.github.pagehelper.Page<com.sky.entity.Employee>
+     * @author: chen
+     * @date: 2023/7/10 14:03
+     */
     Page<Employee> pageQuery(String name);
+
+    /**
+     * @Description:启用禁用员工账号
+     * @return: void
+     * @author: chen
+     * @date: 2023/7/10 14:03
+     */
+    void update(Employee employee);
 }

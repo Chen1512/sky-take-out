@@ -102,4 +102,17 @@ public class EmployeeController {
         return Result.success(pageResult);
     }
 
+    /**
+     * @Description:启用禁用员工账号
+     * @return: com.sky.result.Result
+     * @author: chen
+     * @date: 2023/7/10 13:55
+     */
+    @PostMapping("/status/{status}")
+    @ApiOperation("启用禁用员工账号")
+    public Result startOrStop(@PathVariable Integer status,Long id){
+        employeeService.startOrStop(status,id);
+        return Result.success();
+    }
+
 }
