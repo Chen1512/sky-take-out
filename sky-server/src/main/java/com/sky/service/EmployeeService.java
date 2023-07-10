@@ -38,4 +38,21 @@ public interface EmployeeService {
      * @date: 2023/7/10 13:57
      */
     void startOrStop(Integer status, Long id);
+
+    /**
+     * @Description:根据id查询员工信息
+     * @return: com.sky.entity.Employee
+     * @author: chen
+     * @date: 2023/7/10 14:34
+     */
+    Employee getById(Long id);
+
+    /**
+     * @Description:修改员工消息
+     * @return: com.sky.result.Result
+     * @author: chen
+     * @date: 2023/7/10 14:40
+     */
+    void update(EmployeeDTO employeeDTO);
+
 }

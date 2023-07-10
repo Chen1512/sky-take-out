@@ -44,4 +44,14 @@ public interface EmployeeMapper {
      * @date: 2023/7/10 14:03
      */
     void update(Employee employee);
+
+    /**
+     * @Description:根据id查询员工
+     * @return: com.sky.entity.Employee
+     * @author: chen
+     * @date: 2023/7/10 14:35
+     */
+    @Select("select * from employee where id=#{id}")
+    Employee getById(Long id);
+
 }
