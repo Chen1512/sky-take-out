@@ -88,4 +88,17 @@ public class DishController {
         dishService.update(dishDTO);
         return Result.success();
     }
+
+    /**
+     * @Description:菜品的起售、停售
+     * @return: com.sky.result.Result
+     * @author: chen
+     * @date: 2023/7/12 23:02
+     */
+    @PostMapping("/status/{status}")
+    @ApiOperation("菜品的起售、停售")
+    public Result startOrStop(@PathVariable Integer status,Long id){
+        dishService.startOrStop(status,id);
+        return Result.success();
+    }
 }

@@ -139,4 +139,16 @@ public class DishServiceImpl implements DishService {
             dishFlavorMapper.insertBatch(flavors);
         }
     }
+
+    /**
+     * @Description:菜品的起售、停售
+     * @return: com.sky.result.Result
+     * @author: chen
+     * @date: 2023/7/12 23:02
+     */
+    @Override
+    public void startOrStop(Integer status, Long id) {
+        Dish dish = Dish.builder().status(status).id(id).build();
+        dishMapper.update(dish);
+    }
 }

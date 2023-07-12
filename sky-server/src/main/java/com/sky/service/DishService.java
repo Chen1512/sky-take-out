@@ -52,4 +52,12 @@ public interface DishService {
      * @date: 2023/7/12 21:52
      */
     void update(DishDTO dishDTO);
+
+    /**
+     * @Description:菜品的起售、停售
+     * @return: com.sky.result.Result
+     * @author: chen
+     * @date: 2023/7/12 23:02
+     */
+    void startOrStop(Integer status, Long id);
 }
