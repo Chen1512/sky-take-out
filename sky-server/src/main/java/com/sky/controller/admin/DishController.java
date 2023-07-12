@@ -62,4 +62,30 @@ public class DishController {
         dishService.deleteBatch(ids);
         return Result.success();
     }
+
+    /**
+     * @Description:根据id查询菜品
+     * @return: com.sky.result.Result<com.sky.vo.DishVO>
+     * @author: chen
+     * @date: 2023/7/12 21:42
+     */
+    @GetMapping("/{id}")
+    @ApiOperation("根据id查询菜品")
+    public Result<DishVO> getById(@PathVariable Long id){
+        DishVO dishVO=dishService.getById(id);
+        return Result.success(dishVO);
+    }
+
+    /**
+     * @Description:修改菜品
+     * @return: com.sky.result.Result
+     * @author: chen
+     * @date: 2023/7/12 21:52
+     */
+    @PutMapping
+    @ApiOperation("修改菜品")
+    public Result update(@RequestBody DishDTO dishDTO){
+        dishService.update(dishDTO);
+        return Result.success();
+    }
 }

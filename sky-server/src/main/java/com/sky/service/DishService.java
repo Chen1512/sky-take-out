@@ -37,4 +37,19 @@ public interface DishService {
      */
     void deleteBatch(List<Long> ids);
 
+    /**
+     * @Description:根据id查询菜品
+     * @return: com.sky.result.Result<com.sky.vo.DishVO>
+     * @author: chen
+     * @date: 2023/7/12 21:42
+     */
+    DishVO getById(Long id);
+
+    /**
+     * @Description:修改菜品
+     * @return: com.sky.result.Result
+     * @author: chen
+     * @date: 2023/7/12 21:52
+     */
+    void update(DishDTO dishDTO);
 }

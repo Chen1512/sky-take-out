@@ -102,4 +102,41 @@ public class DishServiceImpl implements DishService {
         });
 
     }
+
+    /**
+     * @Description:根据id查询菜品
+     * @return: com.sky.result.Result<com.sky.vo.DishVO>
+     * @author: chen
+     * @date: 2023/7/12 21:42
+     */
+    @Override
+    public DishVO getById(Long id) {
+        Dish dish = dishMapper.getByid(id);
+        List<DishFlavor> flavors=dishFlavorMapper.getByDishId(id);
+        DishVO dishVO = new DishVO();
+        BeanUtils.copyProperties(dish,dishVO);
+        dishVO.setFlavors(flavors);
+        return dishVO;
+    }
+
+    /**
+     * @Description:修改菜品
+     * @return: com.sky.result.Result
+     * @author: chen
+     * @date: 2023/7/12 21:52
+     */
+    @Override
+    public void update(DishDTO dishDTO) {
+        Dish dish = new Dish();
+        BeanUtils.copyProperties(dishDTO,dish);
+        dishMapper.update(dish);
+        List<DishFlavor> flavors = dishDTO.getFlavors();
+        if (flavors!=null&&flavors.size()>0){
+            dishFlavorMapper.deleteByDishId(dishDTO.getId());
+            flavors.forEach(flavor -> {
+                flavor.setDishId(dishDTO.getId());
+            });
+            dishFlavorMapper.insertBatch(flavors);
+        }
+    }
 }

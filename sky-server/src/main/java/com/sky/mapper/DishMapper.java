@@ -55,4 +55,13 @@ public interface DishMapper {
      */
     @Delete("delete from dish where id=#{id}")
     void deleteById(Long id);
+
+    /**
+     * @Description:修改菜品
+     * @return: com.sky.result.Result
+     * @author: chen
+     * @date: 2023/7/12 21:52
+     */
+    @AutoFill(OperationType.UPDATE)
+    void update(Dish dish);
 }

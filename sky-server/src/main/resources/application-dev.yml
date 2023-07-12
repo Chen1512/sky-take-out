@@ -9,6 +9,6 @@ sky:
 
   alioss:
     endpoint: oss-cn-beijing.aliyuncs.com
-    access-key-id:
-    access-key-secret:
+    access-key-id: LTAI5tSGRg6JWd19RHfmfaAT
+    access-key-secret: SWxcFkLagdCOfvOU1RBmul9nnICsdU
     bucket-name: cc-sky-img
