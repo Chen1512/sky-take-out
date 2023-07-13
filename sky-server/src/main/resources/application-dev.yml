@@ -1,4 +1,9 @@
 sky:
+  redis:
+    host: 192.168.153.131
+    port: 6379
+    password: 123123
+    database: 10
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     host: localhost
@@ -9,6 +14,6 @@ sky:
 
   alioss:
     endpoint: oss-cn-beijing.aliyuncs.com
-    access-key-id: 
-    access-key-secret:
+    access-key-id: LTAI5tSGRg6JWd19RHfmfaAT
+    access-key-secret: SWxcFkLagdCOfvOU1RBmul9nnICsdU
     bucket-name: cc-sky-img
