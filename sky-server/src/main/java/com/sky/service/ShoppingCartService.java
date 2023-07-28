@@ -26,4 +26,19 @@ public interface ShoppingCartService {
      */
     List<ShoppingCart> showShoppingCart();
 
+    /**
+     * @Description:删除购物车
+     * @return: com.sky.result.Result
+     * @author: chen
+     * @date: 2023/7/28 15:58
+     */
+    void subShoppingCart(ShoppingCartDTO shoppingCartDTO);
+
+    /**
+     * @Description:清空购物车
+     * @return: com.sky.result.Result
+     * @author: chen
+     * @date: 2023/7/28 16:16
+     */
+    void cleanShoppingCart();
 }

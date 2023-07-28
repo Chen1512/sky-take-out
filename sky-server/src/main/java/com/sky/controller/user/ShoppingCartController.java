@@ -37,6 +37,8 @@ public class ShoppingCartController {
         shoppingCartService.addShoppingCart(shoppingCartDTO);
         return Result.success();
     }
+
+
     /**
      * @Description:查看购物车
      * @return: com.sky.result.Result<java.util.List<com.sky.entity.ShoppingCart>>
@@ -48,5 +50,31 @@ public class ShoppingCartController {
     public Result<List<ShoppingCart>> list(){
         List<ShoppingCart> list=shoppingCartService.showShoppingCart();
         return Result.success(list);
+    }
+
+    /**
+     * @Description:删除购物车
+     * @return: com.sky.result.Result
+     * @author: chen
+     * @date: 2023/7/28 15:58
+     */
+    @PostMapping("/sub")
+    @ApiOperation("删除购物车")
+    public Result sub(@RequestBody ShoppingCartDTO shoppingCartDTO){
+        shoppingCartService.subShoppingCart(shoppingCartDTO);
+        return Result.success();
+    }
+
+    /**
+     * @Description:清空购物车
+     * @return: com.sky.result.Result
+     * @author: chen
+     * @date: 2023/7/28 16:16
+     */
+    @DeleteMapping("/clean")
+    @ApiOperation("清空购物车")
+    public Result clean(){
+        shoppingCartService.cleanShoppingCart();
+        return Result.success();
     }
 }
