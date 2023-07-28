@@ -40,7 +40,7 @@ public interface CategoryService {
      */
     void startOrStop(Integer status, Long id);
 
-    /**
+    /**用户
      * 根据类型查询分类
      * @param type
      * @return
