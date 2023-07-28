@@ -57,4 +57,119 @@ public class SetmealServiceImpl implements SetmealService {
     public List<DishItemVO> getDishItemById(Long id) {
         return setmealMapper.getDishItemBySetmealId(id);
     }
+
+    /**
+     * @Description:添加套餐
+     * @return: com.sky.result.Result
+     * @author: chen
+     * @date: 2023/7/14 13:11
+     */
+    @Override
+    @Transactional
+    public void save(SetmealDTO setmealDTO) {
+        Setmeal setmeal = new Setmeal();
+        BeanUtils.copyProperties(setmealDTO,setmeal);
+        setmealMapper.insert(setmeal);
+        List<SetmealDish> setmealDishes = setmealDTO.getSetmealDishes();
+        setmealDishes.forEach(setmealDish -> {
+            setmealDish.setSetmealId(setmeal.getId());
+        });
+        setmealDishMapper.insertBatch(setmealDishes);
+    }
+
+    /**
+     * @Description:分页查询
+     * @return: com.sky.result.Result<com.sky.result.PageResult>
+     * @author: chen
+     * @date: 2023/7/14 14:31
+     */
+    @Override
+    public PageResult pageQuery(SetmealPageQueryDTO setmealPageQueryDTO) {
+        PageHelper.startPage(setmealPageQueryDTO.getPage(),setmealPageQueryDTO.getPageSize());
+        Page<SetmealVO> page=setmealMapper.pageQuery(setmealPageQueryDTO);
+        return new PageResult(page.getTotal(),page.getResult());
+    }
+
+    /**
+     * @Description:批量删除套餐
+     * @return: com.sky.result.Result
+     * @author: chen
+     * @date: 2023/7/14 14:53
+     */
+    @Override
+    public void deleteBatch(List<Long> ids) {
+        ids.forEach(id->{
+            Setmeal setmeal=setmealMapper.getByid(id);
+            if (StatusConstant.ENABLE==setmeal.getStatus()){
+                throw new DeletionNotAllowedException(MessageConstant.SETMEAL_ON_SALE);
+            }
+        });
+
+        ids.forEach(setmealId->{
+            setmealMapper.deleteById(setmealId);
+            setmealDishMapper.deleteBySetmealId(setmealId);
+        });
+    }
+
+    /**
+     * @Description:根据id查询套餐
+     * @return: com.sky.vo.SetmealVO
+     * @author: chen
+     * @date: 2023/7/14 15:09
+     * @param id
+     */
+    @Override
+    public SetmealVO getById(Long id) {
+        Setmeal setmeal = setmealMapper.getByid(id);
+        List<SetmealDish> list=setmealDishMapper.getBySetmealId(id);
+        SetmealVO setmealVO = new SetmealVO();
+        BeanUtils.copyProperties(setmeal,setmealVO);
+        setmealVO.setSetmealDishes(list);
+        return setmealVO;
+    }
+
+    /**
+     * @Description:修改套餐
+     * @return: com.sky.result.Result
+     * @author: chen
+     * @date: 2023/7/14 15:21
+     */
+    @Override
+    public void update(SetmealDTO setmealDTO) {
+        Setmeal setmeal = new Setmeal();
+        BeanUtils.copyProperties(setmealDTO,setmeal);
+        setmealMapper.update(setmeal);
+        List<SetmealDish> setmealDishes = setmealDTO.getSetmealDishes();
+        if (setmealDishes!=null&&setmealDishes.size()>0){
+            setmealDishMapper.deleteBySetmealId(setmealDTO.getId());
+            setmealDishes.forEach(setmealDish -> {
+                setmealDish.setSetmealId(setmealDTO.getId());
+            });
+            setmealDishMapper.insertBatch(setmealDishes);
+        }
+    }
+
+    /**
+     * @Description:套餐起售、停售
+     * @return: com.sky.result.Result
+     * @author: chen
+     * @date: 2023/7/14 15:35
+     */
+    @Override
+    public void startOrStop(Integer status, Long id) {
+        if (StatusConstant.ENABLE==status){
+            List<Dish> dishList = dishMapper.getBySetmealId(id);
+            if (dishList!=null&&dishList.size()>0){
+                dishList.forEach(dish -> {
+                    if (StatusConstant.DISABLE==dish.getStatus()){
+                        throw new SetmealEnableFailedException(MessageConstant.SETMEAL_ENABLE_FAILED);
+                    }
+                });
+            }
+        }
+        Setmeal setmeal = Setmeal.builder().id(id).status(status).build();
+        setmealMapper.update(setmeal);
+    }
+
+
 }

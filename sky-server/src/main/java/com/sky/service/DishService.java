@@ -68,4 +68,12 @@ public interface DishService {
      * @return
      */
     List<DishVO> listWithFlavor(Dish dish);
+
+    /**
+     * @Description:根据分类查询菜品
+     * @return: java.util.List<com.sky.entity.Dish>
+     * @author: chen
+     * @date: 2023/7/14 13:46
+     */
+    List<Dish> list(Long categoryId);
 }
