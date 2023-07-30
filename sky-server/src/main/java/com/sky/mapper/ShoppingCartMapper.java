@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Update;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -56,4 +57,12 @@ public interface ShoppingCartMapper {
      */
     @Delete("delete from shopping_cart where user_id=#{userId}")
     void deleteByUserId(Long userId);
+
+    /**
+     * @Description:再来一单
+     * @return: void
+     * @author: chen
+     * @date: 2023/7/30 14:13
+     */
+    void insertBatch(ArrayList<ShoppingCart> shoppingCarts);
 }

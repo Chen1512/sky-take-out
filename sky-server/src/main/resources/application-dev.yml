@@ -1,7 +1,24 @@
 sky:
   wechat:
+#    小程序ID
     appid: wx5ee93b12f76160ba
+#     小程序密钥
     secret: b684309c0cbd9a705355df041b64042b
+
+#    商户号
+    mchid : 1561414331
+#    商户API证书的证书序列号
+    mchSerialNo: 4B3B3DC35414AD50B1B755BAF8DE9CC7CF407606
+#    商户私钥文件
+    privateKeyFilePath: D:\apiclient_key.pem
+#    证书解密的密钥
+    apiV3Key: CZBK51236435wxpay435434323FFDuv3
+#    平台证书文件
+    weChatPayCertFilePath: D:\wechatpay_166D96F876F45C7D07CE98952A96EC980368ACFC.pem
+#    支付成功的回调地址
+    notifyUrl: https://10d147e5.r10.cpolar.top/wxpay/pay.php
+#    支付失败的回调地址
+    refundNotifyUrl: https://10d147e5.r10.cpolar.top/wxpay/pay.php
   redis:
     host: 192.168.153.131
     port: 6379
