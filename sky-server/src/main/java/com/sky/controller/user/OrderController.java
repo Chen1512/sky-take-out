@@ -103,4 +103,17 @@ public class OrderController {
         return Result.success();
     }
 
+    /**
+     * @Description:催单
+     * @return: com.sky.result.Result
+     * @author: chen
+     * @date: 2023/7/31 22:53
+     */
+    @GetMapping("/reminder/{id}")
+    @ApiOperation("催单")
+    public Result reminder(@PathVariable Long id){
+        orderService.reminder(id);
+        return Result.success();
+    }
+
 }

@@ -112,4 +112,12 @@ public interface OrderService {
      * @date: 2023/7/31 10:33
      */
     void complete(Long id);
+
+    /**
+     * @Description:催单
+     * @return: void
+     * @author: chen
+     * @date: 2023/7/31 22:54
+     */
+    void reminder(Long id);
 }

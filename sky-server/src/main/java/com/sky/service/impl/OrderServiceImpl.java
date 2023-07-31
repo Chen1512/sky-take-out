@@ -312,9 +312,9 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderStatisticsVO statistics() {
         Long userId = BaseContext.getCurrentId();
-        Integer confirmed=orderMapper.countStatus(userId,Orders.CONFIRMED);
-        Integer deliveryInProgress=orderMapper.countStatus(userId,Orders.DELIVERY_IN_PROGRESS);
-        Integer toBeConfirmed=orderMapper.countStatus(userId,Orders.TO_BE_CONFIRMED);
+        Integer confirmed=orderMapper.countStatus(Orders.CONFIRMED);
+        Integer deliveryInProgress=orderMapper.countStatus(Orders.DELIVERY_IN_PROGRESS);
+        Integer toBeConfirmed=orderMapper.countStatus(Orders.TO_BE_CONFIRMED);
         OrderStatisticsVO orderStatisticsVO = new OrderStatisticsVO();
         orderStatisticsVO.setConfirmed(confirmed);
         orderStatisticsVO.setDeliveryInProgress(deliveryInProgress);
@@ -411,6 +411,7 @@ public class OrderServiceImpl implements OrderService {
         orderMapper.update(order);
     }
 
+
     /**
      * @Description:检查客户的收货地址是否超出配送范围
      * @return: void
@@ -468,5 +469,28 @@ public class OrderServiceImpl implements OrderService {
             //配送距离超过5000米
             throw new OrderBusinessException("超出配送范围");
         }
+    }
+    /**
+     * @Description:催单
+     * @return: void
+     * @author: chen
+     * @date: 2023/7/31 22:54
+     */
+    @Override
+    public void reminder(Long id) {
+        // 根据id查询订单
+        Orders order = orderMapper.getById(id);
+        // 校验订单是否存在，并且状态为4
+        if (order == null) {
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+
+        Map map = new HashMap();
+        map.put("type", 2);//消息类型，1表示来单提醒
+        map.put("orderId", order.getId());
+        map.put("content", "订单号：" + order.getNumber());
+        //通过WebSocket实现来单提醒，向客户端浏览器推送消息
+        webSocketServer.sendToAllClient(JSON.toJSONString(map));
+
     }
 }

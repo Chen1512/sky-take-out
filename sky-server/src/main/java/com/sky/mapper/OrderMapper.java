@@ -60,8 +60,8 @@ public interface OrderMapper {
      * @author: chen
      * @date: 2023/7/30 23:51
      */
-    @Select("select count(*) from orders where user_id=#{userId} and status=#{status}")
-    Integer countStatus(Long userId, Integer status);
+    @Select("select count(*) from orders where status=#{status}")
+    Integer countStatus(Integer status);
 
     /**
      * @Description:根据状态和下单时间查询订单
