@@ -1,13 +1,13 @@
 package com.sky.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
+import com.google.gson.JsonObject;
 import com.sky.constant.MessageConstant;
 import com.sky.context.BaseContext;
-import com.sky.dto.OrdersDTO;
-import com.sky.dto.OrdersPageQueryDTO;
-import com.sky.dto.OrdersPaymentDTO;
-import com.sky.dto.OrdersSubmitDTO;
+import com.sky.dto.*;
 import com.sky.entity.*;
 import com.sky.exception.AddressBookBusinessException;
 import com.sky.exception.OrderBusinessException;
@@ -15,19 +15,25 @@ import com.sky.exception.ShoppingCartBusinessException;
 import com.sky.mapper.*;
 import com.sky.result.PageResult;
 import com.sky.service.OrderService;
+import com.sky.utils.HttpClientUtil;
 import com.sky.utils.WeChatPayUtil;
 import com.sky.vo.OrderPaymentVO;
+import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrderVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import springfox.documentation.spring.web.json.Json;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author shkstart
@@ -47,6 +53,11 @@ public class OrderServiceImpl implements OrderService {
     private UserMapper userMapper;
     @Autowired
     private WeChatPayUtil weChatPayUtil;
+    @Value("${sky.shop.address}")
+    private String shopAddress;
+
+    @Value("${sky.baidu.ak}")
+    private String ak;
 
     /**
      * @Description:用户下单
@@ -62,6 +73,8 @@ public class OrderServiceImpl implements OrderService {
         if (addressBook==null){
             throw new AddressBookBusinessException(MessageConstant.ADDRESS_BOOK_IS_NULL);
         }
+
+        checkOutOfRange(addressBook.getCityName()+addressBook.getDistrictName()+addressBook.getDetail());
         ShoppingCart shoppingCart = ShoppingCart.builder().userId(BaseContext.getCurrentId()).build();
         List<ShoppingCart> list = shoppingCartMapper.list(shoppingCart);
         if (list==null||list.size()==0){
@@ -191,7 +204,7 @@ public class OrderServiceImpl implements OrderService {
      * @date: 2023/7/29 17:31
      */
     @Override
-    public OrderVO orderDetail(Long id) {
+    public OrderVO detail(Long id) {
         Orders order= orderMapper.getById(id);
         List<OrderDetail> orderDetailList = orderDetailMapper.getByOrderId(id);
         OrderVO orderVO = new OrderVO();
@@ -254,5 +267,186 @@ public class OrderServiceImpl implements OrderService {
             shoppingCarts.add(cart);
         });
         shoppingCartMapper.insertBatch(shoppingCarts);
+    }
+
+    /**
+     * @Description:订单搜索
+     * @return: com.sky.result.PageResult
+     * @author: chen
+     * @date: 2023/7/30 14:40
+     */
+    @Override
+    public PageResult conditionSearch(OrdersPageQueryDTO ordersPageQueryDTO) {
+        PageHelper.startPage(ordersPageQueryDTO.getPage(),ordersPageQueryDTO.getPageSize());
+        List<Orders> list = orderMapper.list(ordersPageQueryDTO);
+        PageResult pageResult = new PageResult(list.size(), list);
+        return pageResult;
+    }
+
+    /**
+     * @Description:各个状态的订单数量统计
+     * @return: com.sky.vo.OrderStatisticsVO
+     * @author: chen
+     * @date: 2023/7/30 23:38
+     */
+    @Override
+    public OrderStatisticsVO statistics() {
+        Long userId = BaseContext.getCurrentId();
+        Integer confirmed=orderMapper.countStatus(userId,Orders.CONFIRMED);
+        Integer deliveryInProgress=orderMapper.countStatus(userId,Orders.DELIVERY_IN_PROGRESS);
+        Integer toBeConfirmed=orderMapper.countStatus(userId,Orders.TO_BE_CONFIRMED);
+        OrderStatisticsVO orderStatisticsVO = new OrderStatisticsVO();
+        orderStatisticsVO.setConfirmed(confirmed);
+        orderStatisticsVO.setDeliveryInProgress(deliveryInProgress);
+        orderStatisticsVO.setToBeConfirmed(toBeConfirmed);
+        return orderStatisticsVO;
+    }
+
+    /**
+     * @Description:接单
+     * @return: void
+     * @author: chen
+     * @date: 2023/7/31 9:22
+     * @param ordersConfirmDTO
+     */
+    @Override
+    public void confirm(OrdersConfirmDTO ordersConfirmDTO) {
+        // 根据id查询订单
+        Orders ordersDB = orderMapper.getById(ordersConfirmDTO.getId());
+
+        // 校验订单是否存在，并且状态为3
+        if (ordersDB == null || !ordersDB.getStatus().equals(Orders.CONFIRMED)) {
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+        Orders order = new Orders();
+        order.setId(ordersConfirmDTO.getId());
+        order.setStatus(Orders.CONFIRMED);
+        orderMapper.update(order);
+    }
+
+    /**
+     * @Description:拒单
+     * @return: void
+     * @author: chen
+     * @date: 2023/7/31 9:34
+     */
+    @Override
+    public void rejection(OrdersRejectionDTO ordersRejectionDTO) throws Exception {
+        Orders order = orderMapper.getById(ordersRejectionDTO.getId());
+        if (order==null||!Orders.TO_BE_CONFIRMED.equals(order.getStatus())){
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+        Integer payStatus = order.getPayStatus();
+        if (Orders.PAID==payStatus){
+            //用户已支付，需要退款
+            String refund = weChatPayUtil.refund(
+                    order.getNumber(),
+                    order.getNumber(),
+                    new BigDecimal(0.01),
+                    new BigDecimal(0.01));
+        }
+
+        Orders orders = new Orders();
+        orders.setId(order.getId());
+        orders.setStatus(Orders.CANCELLED);
+        order.setPayStatus(Orders.REFUND);
+        orders.setRejectionReason(ordersRejectionDTO.getRejectionReason());
+        orders.setCancelTime(LocalDateTime.now());
+        orderMapper.update(orders);
+    }
+
+    /**
+     * @Description:派送订单
+     * @return: void
+     * @author: chen
+     * @date: 2023/7/31 10:25
+     */
+    @Override
+    public void delivery(Long id) {
+        // 根据id查询订单
+        Orders ordersDB = orderMapper.getById(id);
+        // 校验订单是否存在，并且状态为3
+        if (ordersDB == null || !ordersDB.getStatus().equals(Orders.CONFIRMED)) {
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+        Orders order = Orders.builder().id(id).status(Orders.DELIVERY_IN_PROGRESS).build();
+        orderMapper.update(order);
+    }
+
+    /**
+     * @Description:完成订单
+     * @return: void
+     * @author: chen
+     * @date: 2023/7/31 10:33
+     */
+    @Override
+    public void complete(Long id) {
+        // 根据id查询订单
+        Orders ordersDB = orderMapper.getById(id);
+        // 校验订单是否存在，并且状态为3
+        if (ordersDB == null || !ordersDB.getStatus().equals(Orders.DELIVERY_IN_PROGRESS )) {
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+        Orders order = Orders.builder().id(id).status(Orders.COMPLETED).deliveryTime(LocalDateTime.now()).build();
+        orderMapper.update(order);
+    }
+
+    /**
+     * @Description:检查客户的收货地址是否超出配送范围
+     * @return: void
+     * @author: chen
+     * @date: 2023/7/31 11:06
+     */
+    private void checkOutOfRange(String address) {
+        Map map = new HashMap();
+        map.put("address",shopAddress);
+        map.put("output","json");
+        map.put("ak",ak);
+
+        //获取店铺的经纬度坐标
+        String shopCoordinate = HttpClientUtil.doGet("https://api.map.baidu.com/geocoding/v3", map);
+        JSONObject jsonObject = JSON.parseObject(shopCoordinate);
+        if (!"0".equals(jsonObject.getString("status"))){
+            throw new OrderBusinessException("店铺地址解析失败");
+        }
+        JSONObject location = jsonObject.getJSONObject("result").getJSONObject("location");
+        String lat = location.getString("lat");
+        String lng = location.getString("lng");
+        //店铺经纬度坐标
+        String shopLngLat = lat + "," + lng;
+
+        map.put("address",address);
+
+        //获取用户收货地址的经纬度坐标
+        String userCoordinate = HttpClientUtil.doGet("https://api.map.baidu.com/geocoding/v3", map);
+
+        jsonObject = JSON.parseObject(userCoordinate);
+        if(!jsonObject.getString("status").equals("0")){
+            throw new OrderBusinessException("收货地址解析失败");
+        }
+        location = jsonObject.getJSONObject("result").getJSONObject("location");
+        lat = location.getString("lat");
+        lng = location.getString("lng");
+        //用户收货地址经纬度坐标
+        String userLngLat = lat + "," + lng;
+
+        map.put("origin",shopLngLat);
+        map.put("destination",userLngLat);
+        map.put("steps_info","1");
+
+        //路线规划
+        String json = HttpClientUtil.doGet("https://api.map.baidu.com/directionlite/v1/driving", map);
+        jsonObject = JSON.parseObject(json);
+        if(!jsonObject.getString("status").equals("0")){
+            throw new OrderBusinessException("配送路线规划失败");
+        }
+        JSONObject result = jsonObject.getJSONObject("result");
+        JSONArray jsonArray = (JSONArray) result.get("routes");
+        Integer distance = (Integer) ((JSONObject) jsonArray.get(0)).get("distance");
+
+        if(distance > 5000){
+            //配送距离超过5000米
+            throw new OrderBusinessException("超出配送范围");
+        }
     }
 }

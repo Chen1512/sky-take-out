@@ -35,6 +35,10 @@ logging:
         controller: info
 
 sky:
+  shop:
+    address: 北京市海淀区上地十街10号
+  baidu:
+    ak: C1QdG1fF9GLljfSZB7L3ijYhUiBrISmO
   wechat:
     appid: ${sky.wechat.appid}
     secret: ${sky.wechat.secret}

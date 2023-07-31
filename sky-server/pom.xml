@@ -82,11 +82,13 @@
             <artifactId>pagehelper-spring-boot-starter</artifactId>
         </dependency>
 
+<!--        AOP依赖-->
         <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjrt</artifactId>
         </dependency>
 
+<!--        AOP依赖-->
         <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjweaver</artifactId>
@@ -110,11 +112,13 @@
             <artifactId>spring-boot-starter-cache</artifactId>
         </dependency>
 
+<!--        WebSocket 是基于 TCP 的一种新的**网络协议**。它实现了浏览器与服务器全双工通信——浏览器和服务器只需要完成一次握手，两者之间就可以创建**持久性**的连接， 并进行**双向**数据传输。-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-websocket</artifactId>
         </dependency>
 
+<!--        将Java对象与XML文档相互转换-->
         <dependency>
             <groupId>javax.xml.bind</groupId>
             <artifactId>jaxb-api</artifactId>
