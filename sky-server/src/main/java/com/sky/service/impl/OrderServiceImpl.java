@@ -21,6 +21,7 @@ import com.sky.vo.OrderPaymentVO;
 import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrderVO;
+import com.sky.websocket.WebSocketServer;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -53,6 +54,9 @@ public class OrderServiceImpl implements OrderService {
     private UserMapper userMapper;
     @Autowired
     private WeChatPayUtil weChatPayUtil;
+    @Autowired
+    private WebSocketServer webSocketServer;
+
     @Value("${sky.shop.address}")
     private String shopAddress;
 
@@ -112,6 +116,14 @@ public class OrderServiceImpl implements OrderService {
         //封装返回结果
         OrderSubmitVO orderSubmitVO = OrderSubmitVO.builder().id(order.getId()).orderAmount(order.getAmount()).orderNumber(order.getNumber()).orderTime(order.getOrderTime()).build();
 
+        Map map = new HashMap();
+        map.put("type", 1);//消息类型，1表示来单提醒
+        map.put("orderId", order.getId());
+        map.put("content", "订单号：" + order.getNumber());
+        //通过WebSocket实现来单提醒，向客户端浏览器推送消息
+        webSocketServer.sendToAllClient(JSON.toJSONString(map));
+
+
         return  orderSubmitVO;
 
     }
@@ -166,6 +178,14 @@ public class OrderServiceImpl implements OrderService {
                 .build();
 
         orderMapper.update(orders);
+
+        Map map = new HashMap();
+        map.put("type", 1);//消息类型，1表示来单提醒
+        map.put("orderId", orders.getId());
+        map.put("content", "订单号：" + outTradeNo);
+        //通过WebSocket实现来单提醒，向客户端浏览器推送消息
+        webSocketServer.sendToAllClient(JSON.toJSONString(map));
+
     }
 
     /**
@@ -314,8 +334,8 @@ public class OrderServiceImpl implements OrderService {
         // 根据id查询订单
         Orders ordersDB = orderMapper.getById(ordersConfirmDTO.getId());
 
-        // 校验订单是否存在，并且状态为3
-        if (ordersDB == null || !ordersDB.getStatus().equals(Orders.CONFIRMED)) {
+        // 校验订单是否存在，并且状态为2
+        if (ordersDB == null || !ordersDB.getStatus().equals(Orders.TO_BE_CONFIRMED)) {
             throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
         }
         Orders order = new Orders();
@@ -383,7 +403,7 @@ public class OrderServiceImpl implements OrderService {
     public void complete(Long id) {
         // 根据id查询订单
         Orders ordersDB = orderMapper.getById(id);
-        // 校验订单是否存在，并且状态为3
+        // 校验订单是否存在，并且状态为4
         if (ordersDB == null || !ordersDB.getStatus().equals(Orders.DELIVERY_IN_PROGRESS )) {
             throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
         }

@@ -16,9 +16,9 @@ sky:
 #    平台证书文件
     weChatPayCertFilePath: D:\wechatpay_166D96F876F45C7D07CE98952A96EC980368ACFC.pem
 #    支付成功的回调地址
-    notifyUrl: https://10d147e5.r10.cpolar.top/wxpay/pay.php
+    notifyUrl: https://10d147e5.r10.cpolar.top/wxpay/paySuccess
 #    支付失败的回调地址
-    refundNotifyUrl: https://10d147e5.r10.cpolar.top/wxpay/pay.php
+    refundNotifyUrl: https://10d147e5.r10.cpolar.top/wxpay/refundSuccess
   redis:
     host: 192.168.153.131
     port: 6379
