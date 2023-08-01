@@ -1,5 +1,6 @@
 package com.sky.mapper;
 
+import com.sky.dto.GoodsSalesDTO;
 import com.sky.dto.OrdersPageQueryDTO;
 import com.sky.entity.Orders;
 import com.sky.vo.OrderStatisticsVO;
@@ -70,7 +71,7 @@ public interface OrderMapper {
      * @author: chen
      * @date: 2023/7/31 16:07
      */
-    @Select("select * from orders where status=${status} and order_time<#{orderTime}")
+    @Select("select * from orders where status=#{status} and order_time<#{orderTime}")
     List<Orders> getByStatusAndOrdertimeLT(Integer status, LocalDateTime orderTime);
 
     /**
@@ -80,4 +81,20 @@ public interface OrderMapper {
      * @date: 2023/8/1 11:16
      */
     Double sumByMap(Map map);
+
+    /**
+     * @Description:根据动态条件统计订单数量
+     * @return: java.lang.Integer
+     * @author: chen
+     * @date: 2023/8/1 14:37
+     */
+    Integer countByMap(Map map);
+
+    /**
+     * @Description:查询销量排名top10接口
+     * @return: java.util.List<com.sky.dto.GoodsSalesDTO>
+     * @author: chen
+     * @date: 2023/8/1 15:48
+     */
+    List<GoodsSalesDTO> getSalesTop10(LocalDateTime begin, LocalDateTime end);
 }
