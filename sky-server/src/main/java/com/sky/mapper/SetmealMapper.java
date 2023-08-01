@@ -84,4 +84,13 @@ public interface SetmealMapper {
      */
     @Delete("delete from setmeal where id=#{setmealId}")
     void deleteById(Long setmealId);
+
+    /**
+     * @Description:根据状态查询套餐数量
+     * @return: java.lang.Integer
+     * @author: chen
+     * @date: 2023/8/1 17:28
+     */
+    @Select("select COUNT(id) from setmeal where status=#{status}")
+    Integer getByStatus(Integer status);
 }
