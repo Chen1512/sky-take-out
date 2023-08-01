@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Select;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author shkstart
@@ -71,4 +72,12 @@ public interface OrderMapper {
      */
     @Select("select * from orders where status=${status} and order_time<#{orderTime}")
     List<Orders> getByStatusAndOrdertimeLT(Integer status, LocalDateTime orderTime);
+
+    /**
+     * @Description:营业额统计接口
+     * @return: java.lang.Double
+     * @author: chen
+     * @date: 2023/8/1 11:16
+     */
+    Double sumByMap(Map map);
 }
