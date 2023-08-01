@@ -1,7 +1,6 @@
 package com.sky.service.impl;
 
 import com.sky.entity.Orders;
-import com.sky.entity.Setmeal;
 import com.sky.mapper.DishMapper;
 import com.sky.mapper.OrderMapper;
 import com.sky.mapper.SetmealMapper;
@@ -11,13 +10,10 @@ import com.sky.vo.BusinessDataVO;
 import com.sky.vo.DishOverViewVO;
 import com.sky.vo.OrderOverViewVO;
 import com.sky.vo.SetmealOverViewVO;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,25 +37,25 @@ public class WorkspaceServiceImpl implements WorkspaceService {
      * @return: com.sky.vo.BusinessDataVO
      * @author: chen
      * @date: 2023/8/1 16:45
+     * @param begin
+     * @param end
      */
     @Override
-    public BusinessDataVO businessData() {
+    public BusinessDataVO businessData(LocalDateTime begin, LocalDateTime end) {
         Map map = new HashMap();
-        LocalDate nowDate = LocalDate.now();
-        LocalDateTime begin = LocalDateTime.of(nowDate, LocalTime.MIN);
         map.put("begin",begin);
-        map.put("end",LocalDateTime.now());
+        map.put("end",end);
 
 
-        Integer newUsers = userMapper.countByMap(map);
-        Integer totle = orderMapper.countByMap(map);
+        Integer newUsers = userMapper.countByMap(map)==null?0:userMapper.countByMap(map);
+        Integer totle = orderMapper.countByMap(map)==null?0:orderMapper.countByMap(map);
         map.put("status", Orders.COMPLETED);
-        Integer validOrderCount = orderMapper.countByMap(map);
+        Integer validOrderCount = orderMapper.countByMap(map)==null?0:orderMapper.countByMap(map);
         Double orderCompletionRate=0.0;
         if (totle!=null&&totle!=0){
             orderCompletionRate= Double.valueOf(validOrderCount/totle);
         }
-        Double turnover = orderMapper.sumByMap(map);
+        Double turnover = orderMapper.sumByMap(map)==null?0.0:orderMapper.sumByMap(map);
         Double unitPrice = 0.0;
         if (totle!=null&&totle!=0&&turnover!=null){
             unitPrice = turnover/totle;

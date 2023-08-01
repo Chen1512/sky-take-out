@@ -5,6 +5,8 @@ import com.sky.vo.DishOverViewVO;
 import com.sky.vo.OrderOverViewVO;
 import com.sky.vo.SetmealOverViewVO;
 
+import java.time.LocalDateTime;
+
 /**
  * @author shkstart
  * @create 2023--01-16:42
@@ -15,8 +17,10 @@ public interface WorkspaceService {
      * @return: com.sky.vo.BusinessDataVO
      * @author: chen
      * @date: 2023/8/1 16:45
+     * @param begin
+     * @param end
      */
-    BusinessDataVO businessData();
+    BusinessDataVO businessData(LocalDateTime begin, LocalDateTime end);
 
     /**
      * @Description:查询订单管理数据
